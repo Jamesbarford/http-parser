@@ -30,5 +30,6 @@ typedef struct http_response_t {
 void parse_request(char *req_raw, http_request_t *req);
 void parse_response(char *res_raw, http_response_t *res);
 headers_kv_t *find_header(headers_kv_t *headers, int num_headers, char *key);
+char *get_response_body(http_response_t *res);
 
 #endif

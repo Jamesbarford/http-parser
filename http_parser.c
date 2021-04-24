@@ -174,6 +174,17 @@ headers_kv_t *find_header(headers_kv_t *headers, int num_headers, char *key) {
 	return NULL;
 }
 
+char *get_response_body(http_response_t *res) {
+	if (res->num_headers == 0)
+		return NULL;
+
+	headers_kv_t header = res->headers[res->num_headers];
+
+	if (strcmp(header.key, "body") == 0)
+		return header.value;
+	return NULL;
+}
+
 void parse_request(char *req_raw, http_request_t *req) {
 	int offset = __parse_request(req_raw, req);
 	int num_headers = parse_headers(offset, req_raw, req->headers);

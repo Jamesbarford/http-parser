@@ -109,3 +109,9 @@ As a convenience for getting a header, will return a pointer to a header or `NUL
 ```c
 headers_kv_t *find_header(headers_kv_t *headers, int num_headers, char *key);
 ```
+
+Utliity for getting the response body if there is one or `NULL`. The "body" is a header that has been added as a convenience for getting the response body. It is the last header and can be accessed in O(1).
+
+```c
+char *get_response_body(http_response_t *res);
+```
