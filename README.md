@@ -31,7 +31,7 @@ void some_function(void) {
   while ((bytes = read(socket_fd, buf, BUFSIZ)) > 0);
 
   if (bytes == 0) {
-		// handle error
+    // handle error
     return;
   }
 
@@ -80,8 +80,8 @@ void some_function(void) {
   while ((bytes = read(socket_fd, buf, BUFSIZ)) > 0);
 
   if (bytes == 0) {
-		// handle error
-  return;
+    // handle error
+    return;
   }
 
   parse_response(buf, &res);
