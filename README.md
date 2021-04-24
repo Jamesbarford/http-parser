@@ -25,6 +25,7 @@ The primary `struct` `http_request_t` has the following fields:
 
 void some_function(void) {
   char buf[BUFSIZ];
+  char buf2[BUFSIZ];
   int socket_fd, bytes;
   http_request_t req;
 
@@ -35,13 +36,14 @@ void some_function(void) {
     return;
   }
 
+  parse_request(buf, buf2, &req);
+
   printf("%s %s HTTP/%s\n", req.http_method, req.path, req.http_version);
 	
   for (int i = 0; i < req.num_headers; ++i) {
     printf("%s: %s\n", req.headers[i].key, req.headers[i].value);
   }
 
-  parse_request(buf, BUFSIZ, &req);
 }
 ```
 
@@ -74,6 +76,7 @@ The primary struct `http_response_t` consists of the following fields:
 
 void some_function(void) {
   char buf[BUFSIZ];
+  char buf2[BUFSIZ];
   int socket_fd, bytes;
   http_response_t res;
 
@@ -84,13 +87,13 @@ void some_function(void) {
   return;
   }
 
+  parse_response(buf, buf2, &res);
+
   printf("HTTP/%s %s %s\n", res.http_version, res.status_code, res.status_text);
 	
   for (int i = 0; i < res.num_headers; ++i) {
     printf("%s: %s\n", res.headers[i].key, res.headers[i].value);
   }
-
-  parse_response(buf, BUFSIZ, &res);
 }
 ```
 ## Methods

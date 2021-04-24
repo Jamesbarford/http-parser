@@ -38,7 +38,7 @@ static int __parse_response(char *res_raw, http_response_t *res) {
 	res_raw[offset - 1] = '\0';
 	res->status_text = &res_raw[prev_pos];
 
-	return offset;
+	return offset + 2;
 }
 
 /**
@@ -49,7 +49,7 @@ static int __parse_response(char *res_raw, http_response_t *res) {
  * a positive integer is success
  */
 static int __parse_request(char *req_raw, http_request_t *req) {
-	int offset = 0, j = 0, prev_pos = 0;
+	int offset = 0, prev_pos = 0;
 
 	// GET <- walk to this piece of white space
 	while (req_raw[offset++] != ' ');
@@ -72,9 +72,8 @@ static int __parse_request(char *req_raw, http_request_t *req) {
 		req->http_version[2] = req_raw[++offset];
 	}
 
-	if (req_raw[offset] == '\n')
-		return offset + 1;
-	return offset;
+	// \r\n
+	return offset + 2;
 }
 
 /**
@@ -128,21 +127,22 @@ static int parse_headers(char *buf, int offset, char *req_raw, headers_kv_t *hea
 			case '\n':
 			case '\r': {
 				new_line_count++;
-				buf[buf_pos - 1] = '\0';
 
-				if (new_line_count > 2) {
+				if (new_line_count == 2) {
+					buf[buf_pos - 1] = '\0';
+					ptr = &buf[prev_pos];
+					
+					headers[num_headers].value = ptr;
+					headers[num_headers].value_len = strlen(ptr);
+
+					part = KEY;
+					ptr = &buf[buf_pos];
+					num_headers++;
+				} else if (new_line_count > 2) {
 					headers[num_headers-1].value = ptr;
 					headers[num_headers-1].key = "body";
-					goto done;
 				}
 
-				part = KEY;
-				ptr = &buf[prev_pos];
-
-				headers[num_headers].value = ptr;
-				headers[num_headers].value_len = strlen(ptr);
-				ptr = &buf[buf_pos];
-				num_headers++;
 				break;
 			}
 
@@ -188,4 +188,3 @@ void parse_response(char *buf, char *res_raw, http_response_t *res) {
 	int num_headers = parse_headers(buf, offset, res_raw, res->headers);
 	res->num_headers = num_headers;
 }
-
