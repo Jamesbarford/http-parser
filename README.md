@@ -1,6 +1,6 @@
-# HTTP Request Parser
+# HTTP Request/Response Parser
 
-An implementation for parsing an http response/request.
+An implementation for parsing an http request/response.
 
 ## HTTP Request
 
