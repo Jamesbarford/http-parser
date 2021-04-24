@@ -2,7 +2,7 @@
 
 An implementation for parsing an http response/request.
 
-## Usage
+## HTTP Request
 
 The primary `struct` `http_request_t` has the following fields:
 
@@ -10,8 +10,6 @@ The primary `struct` `http_request_t` has the following fields:
 - path: the requested path i.e `/name-of/resource`
 - http_version: `"2"`, `"1.1"`, `"1"`
 - headers: An array of headers in key value pairings;
-
-## HTTP Request
 
 ### Example:
 
@@ -26,24 +24,24 @@ The primary `struct` `http_request_t` has the following fields:
 #include "http_parser.h"
 
 void some_function(void) {
-	char buf[BUFSIZ];
-	int socket_fd, bytes;
-	http_request_t req;
+  char buf[BUFSIZ];
+  int socket_fd, bytes;
+  http_request_t req;
 
-	while ((bytes = read(socket_fd, buf, BUFSIZ)) > 0);
+  while ((bytes = read(socket_fd, buf, BUFSIZ)) > 0);
 
-	if (bytes == 0) {
+  if (bytes == 0) {
 		// handle error
-		return;
-	}
+    return;
+  }
 
-	printf("%s %s HTTP/%s\n", req.http_method, req.path, req.http_version);
+  printf("%s %s HTTP/%s\n", req.http_method, req.path, req.http_version);
 	
-	for (int i = 0; i < req.num_headers; ++i) {
-		printf("%s: %s\n", req.headers[i].key, req.headers[i].value);
-	}
+  for (int i = 0; i < req.num_headers; ++i) {
+    printf("%s: %s\n", req.headers[i].key, req.headers[i].value);
+  }
 
-	parse_request(buf, BUFSIZ, &req);
+  parse_request(buf, BUFSIZ, &req);
 }
 ```
 
@@ -60,6 +58,12 @@ void parse_request(char *buf, char *req_raw, http_request_t *req);
 
 A very simliar the request parser.
 
+The primary struct `http_response_t` consists of the following fields:
+
+- `http_version` - `"1"`, `"1.1"`, `"2"`
+- `status_code` char * i.e `"200"`, `"400"`.
+- `status_text` char * i.e "OK", "Bad Request"
+
 ```c
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,24 +73,24 @@ A very simliar the request parser.
 #include "http_parser.h"
 
 void some_function(void) {
-	char buf[BUFSIZ];
-	int socket_fd, bytes;
-	http_response_t res;
+  char buf[BUFSIZ];
+  int socket_fd, bytes;
+  http_response_t res;
 
-	while ((bytes = read(socket_fd, buf, BUFSIZ)) > 0);
+  while ((bytes = read(socket_fd, buf, BUFSIZ)) > 0);
 
-	if (bytes == 0) {
+  if (bytes == 0) {
 		// handle error
-		return;
-	}
+  return;
+  }
 
-	printf("HTTP/%s %s %s\n", res.http_version, res.status_code, res.status_text);
+  printf("HTTP/%s %s %s\n", res.http_version, res.status_code, res.status_text);
 	
-	for (int i = 0; i < res.num_headers; ++i) {
-		printf("%s: %s\n", res.headers[i].key, res.headers[i].value);
-	}
+  for (int i = 0; i < res.num_headers; ++i) {
+    printf("%s: %s\n", res.headers[i].key, res.headers[i].value);
+  }
 
-	parse_response(buf, BUFSIZ, &res);
+  parse_response(buf, BUFSIZ, &res);
 }
 ```
 ## Methods
