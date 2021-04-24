@@ -1,6 +1,6 @@
 # HTTP Request/Response Parser
 
-An implementation for parsing an http request/response.
+An implementation for parsing an http request/response. Internally the parser does not allocate memory from the heap/
 
 ## HTTP Request
 
