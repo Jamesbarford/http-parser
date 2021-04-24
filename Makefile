@@ -1,7 +1,7 @@
 OUT = build
 TARGET = parse_headers.out
 CC = cc
-CFLAGS = -Wall -Wextra -Wpedantic -g -O0
+CFLAGS = -Wall -Wextra -Werror -Wpedantic -g -O0
 
 $(OUT)/%.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $<

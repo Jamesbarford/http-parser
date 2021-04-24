@@ -1,6 +1,6 @@
 # HTTP Request/Response Parser
 
-An implementation for parsing an http request/response. Internally the parser does not allocate memory from the heap.
+An implementation for parsing an http request/response. Internally the parser does not allocate memory from the heap. The aim is for a simple function call requiring as little setup as possible.
 
 ## HTTP Request
 
@@ -25,7 +25,6 @@ The primary `struct` `http_request_t` has the following fields:
 
 void some_function(void) {
   char buf[BUFSIZ];
-  char buf2[BUFSIZ];
   int socket_fd, bytes;
   http_request_t req;
 
@@ -36,21 +35,20 @@ void some_function(void) {
     return;
   }
 
-  parse_request(buf, buf2, &req);
+  parse_request(buf, &req);
 
   printf("%s %s HTTP/%s\n", req.http_method, req.path, req.http_version);
 	
   for (int i = 0; i < req.num_headers; ++i) {
     printf("%s: %s\n", req.headers[i].key, req.headers[i].value);
   }
-
 }
 ```
 
 ## Methods
 
 ```c
-void parse_request(char *buf, char *req_raw, http_request_t *req);
+void parse_request(char *request_raw, http_request_t *req);
 ```
 - `buf` a character array used internally
 - `req_raw` the raw response
@@ -76,7 +74,6 @@ The primary struct `http_response_t` consists of the following fields:
 
 void some_function(void) {
   char buf[BUFSIZ];
-  char buf2[BUFSIZ];
   int socket_fd, bytes;
   http_response_t res;
 
@@ -87,7 +84,7 @@ void some_function(void) {
   return;
   }
 
-  parse_response(buf, buf2, &res);
+  parse_response(buf, &res);
 
   printf("HTTP/%s %s %s\n", res.http_version, res.status_code, res.status_text);
 	
@@ -99,7 +96,7 @@ void some_function(void) {
 ## Methods
 
 ```c
-void parse_response(char *buf, char *req_raw, http_response_t *res);
+void parse_response(char *resonse_raw, http_response_t *res);
 ```
 - `buf` a character array used internally
 - `req_raw` the raw response
@@ -107,8 +104,8 @@ void parse_response(char *buf, char *req_raw, http_response_t *res);
 
 ### Utils
 
-As a convenience for getting a header the following will return a pointer to a header or `NULL`.
+As a convenience for getting a header, will return a pointer to a header or `NULL`.
 
 ```c
-headers_kv_t *find_header(http_request_t *req, char *key);
+headers_kv_t *find_header(headers_kv_t *headers, int num_headers, char *key);
 ```

@@ -18,7 +18,6 @@ int main(int argc, char **argv) {
 	struct stat sb;
 	http_request_t req;
 	//http_response_t res;
-	char buf[BUFSIZ];
 
 	if ((fd = open(argv[1], O_RDONLY)) == -1) {
 		perror("Failed to open file");
@@ -42,7 +41,7 @@ int main(int argc, char **argv) {
 //		printf("%s: %s\n", res.headers[i].key, res.headers[i].value);
 //	}
 
-	parse_request(buf, example, &req);
+	parse_request(example, &req);
 	printf("%s %s HTTP/%s\n",
 			req.http_method,
 			req.path,
