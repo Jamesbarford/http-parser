@@ -6,7 +6,7 @@
 
 #include "http_parser.h"
 
-enum HTTP_KV { KEY, VALUE };
+enum HTTP_KV { KEY, VALUE, CONTENT };
 
 static int parse_headers(int offset, char *req_raw, headers_kv_t *headers);
 
@@ -117,8 +117,9 @@ static int parse_headers(int offset, char *req_raw, headers_kv_t *headers) {
 
 		switch (req_raw[offset]) {
 			case '\0':
-			case EOF:
+			case EOF: {
 				goto done;
+			}
 
 			case '\n':
 			case '\r': {
@@ -136,6 +137,7 @@ static int parse_headers(int offset, char *req_raw, headers_kv_t *headers) {
 					prev_pos = offset;
 					num_headers++;
 				} else if (new_line_count >= 3) {
+					part = CONTENT;
 					headers[num_headers-1].value = ptr;
 					headers[num_headers-1].key = "body";
 				}
@@ -144,6 +146,9 @@ static int parse_headers(int offset, char *req_raw, headers_kv_t *headers) {
 			}
 
 			case ':': {
+				if (part == CONTENT) {
+					continue;
+				}
 				new_line_count = 0;
 				if (part == KEY) {
 					req_raw[offset] = '\0';
