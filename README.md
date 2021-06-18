@@ -35,7 +35,7 @@ void someFunction(void) {
     return;
   }
 
-  parseRequest(buf, &req);
+  httpParseRequest(buf, &req);
 
   printf("%s %s HTTP/%s\n", req.http_method, req.path, req.http_version);
 	
@@ -48,7 +48,7 @@ void someFunction(void) {
 ## Methods
 
 ```c
-void parseRequest(char *request_raw, http_request_t *req);
+void httpParseRequest(char *request_raw, http_request_t *req);
 ```
 - `buf` a character array used internally
 - `req_raw` the raw response
@@ -84,7 +84,7 @@ void someFunction(void) {
     return;
   }
 
-  parseResponse(buf, &res);
+  httpParseResponse(buf, &res);
 
   printf("HTTP/%s %s %s\n", res.http_version, res.status_code, res.status_text);
 	
@@ -96,9 +96,8 @@ void someFunction(void) {
 ## Methods
 
 ```c
-void parseResponse(char *resonse_raw, http_response_t *res);
+void httpParseResponse(char *resonse_raw, http_response_t *res);
 ```
-- `buf` a character array used internally
 - `req_raw` the raw response
 - `req` a `http_response_t`, which on success will be populated explicitly with the HTTP version, Status code and Status Text
 
@@ -107,11 +106,11 @@ void parseResponse(char *resonse_raw, http_response_t *res);
 As a convenience for getting a header, will return a pointer to a header or `NULL`.
 
 ```c
-headers_kv_t *findHeader(headers_kv_t *headers, int num_headers, char *key);
+headers_kv_t *httpFindHeader(headers_kv_t *headers, int num_headers, char *key);
 ```
 
 Utliity for getting the response body if there is one or `NULL`. The "body" is a header that has been added as a convenience for getting the response body. It is the last header and can be accessed in O(1).
 
 ```c
-char *getResponseBody(http_response_t *res);
+char *httpGetResponseBody(http_response_t *res);
 ```

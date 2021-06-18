@@ -27,9 +27,9 @@ typedef struct http_response_t {
 	headers_kv_t headers[MAX_HEADERS];
 } http_response_t;
 
-void parseRequest(char *req_raw, http_request_t *req);
-void parseResponse(char *res_raw, http_response_t *res);
-headers_kv_t *findHeader(headers_kv_t *headers, int num_headers, char *key);
-char *getResponseBody(http_response_t *res);
+void httpParseRequest(char *req_raw, http_request_t *req);
+void httpParseResponse(char *res_raw, http_response_t *res);
+headers_kv_t *httpFindHeader(headers_kv_t *headers, int num_headers, char *key);
+char *httpGetResponseBody(http_response_t *res);
 
 #endif
