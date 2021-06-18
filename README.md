@@ -8,7 +8,7 @@ The primary `struct` `http_request_t` has the following fields:
 
 - http_method: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `CONNECT`, `DELETE`, `TRACE`, `OPTIONS`
 - path: the requested path i.e `/name-of/resource`
-- http_version: `"2"`, `"1.1"`, `"1"`
+- http_version: `"1.1"`, `"1"`
 - headers: An array of headers in key value pairings;
 
 ### Example:
@@ -23,7 +23,7 @@ The primary `struct` `http_request_t` has the following fields:
 
 #include "http_parser.h"
 
-void some_function(void) {
+void someFunction(void) {
   char buf[BUFSIZ];
   int socket_fd, bytes;
   http_request_t req;
@@ -35,7 +35,7 @@ void some_function(void) {
     return;
   }
 
-  parse_request(buf, &req);
+  parseRequest(buf, &req);
 
   printf("%s %s HTTP/%s\n", req.http_method, req.path, req.http_version);
 	
@@ -48,7 +48,7 @@ void some_function(void) {
 ## Methods
 
 ```c
-void parse_request(char *request_raw, http_request_t *req);
+void parseRequest(char *request_raw, http_request_t *req);
 ```
 - `buf` a character array used internally
 - `req_raw` the raw response
@@ -72,7 +72,7 @@ The primary struct `http_response_t` consists of the following fields:
 
 #include "http_parser.h"
 
-void some_function(void) {
+void someFunction(void) {
   char buf[BUFSIZ];
   int socket_fd, bytes;
   http_response_t res;
@@ -84,7 +84,7 @@ void some_function(void) {
     return;
   }
 
-  parse_response(buf, &res);
+  parseResponse(buf, &res);
 
   printf("HTTP/%s %s %s\n", res.http_version, res.status_code, res.status_text);
 	
@@ -96,7 +96,7 @@ void some_function(void) {
 ## Methods
 
 ```c
-void parse_response(char *resonse_raw, http_response_t *res);
+void parseResponse(char *resonse_raw, http_response_t *res);
 ```
 - `buf` a character array used internally
 - `req_raw` the raw response
@@ -107,11 +107,11 @@ void parse_response(char *resonse_raw, http_response_t *res);
 As a convenience for getting a header, will return a pointer to a header or `NULL`.
 
 ```c
-headers_kv_t *find_header(headers_kv_t *headers, int num_headers, char *key);
+headers_kv_t *findHeader(headers_kv_t *headers, int num_headers, char *key);
 ```
 
 Utliity for getting the response body if there is one or `NULL`. The "body" is a header that has been added as a convenience for getting the response body. It is the last header and can be accessed in O(1).
 
 ```c
-char *get_response_body(http_response_t *res);
+char *getResponseBody(http_response_t *res);
 ```
