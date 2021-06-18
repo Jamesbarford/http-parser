@@ -11,7 +11,7 @@ enum HTTP_KV { KEY, VALUE, CONTENT };
 static int __parse_response(char *res_raw, http_response_t *res) {
 	int offset = 0, prev_pos = 0;
 
-	// Walk to HTTP/2 <- to get the number
+	// Walk to HTTP/1 <- to get the number
 	while (!isdigit(res_raw[offset++]));
 	res->http_version[0] = res_raw[offset-1];
 	// Check for minor
@@ -123,7 +123,7 @@ static int parseValue(char *raw, char **current, headers_kv_t *headers,
 static int parseHeaders(int offset, char *req_raw, headers_kv_t *headers) {
 	/**
 	 * We don't want to parse the first line of the request again as that is:
-	 * GET /path/of/thing HTTP/2
+	 * GET /path/of/thing HTTP/1
 	 *
 	 * So get the offset and start from there
 	 */
