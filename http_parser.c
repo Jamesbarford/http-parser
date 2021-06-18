@@ -8,8 +8,6 @@
 
 enum HTTP_KV { KEY, VALUE, CONTENT };
 
-static int parse_headers(int offset, char *req_raw, headers_kv_t *headers);
-
 static int __parse_response(char *res_raw, http_response_t *res) {
 	int offset = 0, prev_pos = 0;
 
@@ -187,7 +185,7 @@ done:
 	return num_headers;
 }
 
-headers_kv_t *find_header(headers_kv_t *headers, int num_headers, char *key) {
+headers_kv_t *findHeader(headers_kv_t *headers, int num_headers, char *key) {
 	for (int i = 0; i < num_headers; ++i) {
 		if (strcmp(headers[i].key, key) == 0)
 			return &headers[i];	
@@ -195,7 +193,7 @@ headers_kv_t *find_header(headers_kv_t *headers, int num_headers, char *key) {
 	return NULL;
 }
 
-char *get_response_body(http_response_t *res) {
+char *getResponseBody(http_response_t *res) {
 	if (res->num_headers == 0)
 		return NULL;
 
@@ -206,13 +204,13 @@ char *get_response_body(http_response_t *res) {
 	return NULL;
 }
 
-void parse_request(char *req_raw, http_request_t *req) {
+void parseRequest(char *req_raw, http_request_t *req) {
 	int offset = __parse_request(req_raw, req);
 	int num_headers = parseHeaders(offset, req_raw, req->headers);
 	req->num_headers = num_headers;
 }
 
-void parse_response(char *res_raw, http_response_t *res) {
+void parseResponse(char *res_raw, http_response_t *res) {
 	int offset = __parse_response(res_raw, res);
 	int num_headers = parseHeaders(offset, res_raw, res->headers);
 	res->num_headers = num_headers - 2; // body is -1
