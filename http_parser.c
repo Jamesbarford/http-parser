@@ -38,7 +38,7 @@ static int __parse_response(char *res_raw, http_response_t *res) {
 	res_raw[offset - 1] = '\0';
 	res->status_text = &res_raw[prev_pos];
 
-	return offset + 1;
+	return offset;
 }
 
 /**
@@ -76,6 +76,30 @@ static int __parse_request(char *req_raw, http_request_t *req) {
 	return offset + 1;
 }
 
+static int parseKey(char *raw, char *current, headers_kv_t *headers, int offset,
+		int idx) {
+	raw[offset] = '\0';
+	headers[idx].key = current;
+	headers[idx].key_len = strlen(current);
+
+	// move past : and the space after
+	return offset + 2;
+}
+
+static int parseValue(char *raw, char **current, headers_kv_t *headers,
+		int prev, int offset, int idx) {
+
+	raw[offset] = '\0';
+	*current = &raw[prev];
+
+	headers[idx].value = *current;
+	headers[idx].value_len = strlen(*current);
+
+	*current = &raw[offset + 1];
+
+	return offset + 1;
+}
+
 /**
  * HTTP Key: Value 
  *
@@ -98,7 +122,7 @@ static int __parse_request(char *req_raw, http_request_t *req) {
  * @req_raw raw request
  * @req pointer to the http_request_t object, which is where the key->values will be stored
  */
-static int parse_headers(int offset, char *req_raw, headers_kv_t *headers) {
+static int parseHeaders(int offset, char *req_raw, headers_kv_t *headers) {
 	/**
 	 * We don't want to parse the first line of the request again as that is:
 	 * GET /path/of/thing HTTP/2
@@ -114,6 +138,9 @@ static int parse_headers(int offset, char *req_raw, headers_kv_t *headers) {
 
 	for (;;) {
 		offset++;
+		if (part == CONTENT) {
+			break;
+		}
 
 		switch (req_raw[offset]) {
 			case '\0':
@@ -126,17 +153,11 @@ static int parse_headers(int offset, char *req_raw, headers_kv_t *headers) {
 				new_line_count++;
 
 				if (new_line_count == 2) {
-					req_raw[offset] = '\0';
-					ptr = &req_raw[prev_pos];
-					
-					headers[num_headers].value = ptr;
-					headers[num_headers].value_len = strlen(ptr);
-
+					prev_pos = parseValue(req_raw, &ptr, headers, prev_pos, offset, num_headers);
 					part = KEY;
-					ptr = &req_raw[offset+1];
-					prev_pos = offset;
 					num_headers++;
 				} else if (new_line_count >= 3) {
+					ptr+=2;
 					part = CONTENT;
 					headers[num_headers-1].value = ptr;
 					headers[num_headers-1].key = "body";
@@ -151,13 +172,8 @@ static int parse_headers(int offset, char *req_raw, headers_kv_t *headers) {
 				}
 				new_line_count = 0;
 				if (part == KEY) {
-					req_raw[offset] = '\0';
-
-					headers[num_headers].key = ptr;
-					headers[num_headers].key_len = strlen(ptr);
-
+					prev_pos = parseKey(req_raw, ptr, headers, offset, num_headers);
 					part = VALUE;
-					prev_pos = offset + 2;
 				}
 				break;
 			}
@@ -183,7 +199,7 @@ char *get_response_body(http_response_t *res) {
 	if (res->num_headers == 0)
 		return NULL;
 
-	headers_kv_t header = res->headers[res->num_headers];
+	headers_kv_t header = res->headers[res->num_headers+1];
 
 	if (strcmp(header.key, "body") == 0)
 		return header.value;
@@ -192,12 +208,12 @@ char *get_response_body(http_response_t *res) {
 
 void parse_request(char *req_raw, http_request_t *req) {
 	int offset = __parse_request(req_raw, req);
-	int num_headers = parse_headers(offset, req_raw, req->headers);
+	int num_headers = parseHeaders(offset, req_raw, req->headers);
 	req->num_headers = num_headers;
 }
 
 void parse_response(char *res_raw, http_response_t *res) {
 	int offset = __parse_response(res_raw, res);
-	int num_headers = parse_headers(offset, res_raw, res->headers);
-	res->num_headers = num_headers;
+	int num_headers = parseHeaders(offset, res_raw, res->headers);
+	res->num_headers = num_headers - 2; // body is -1
 }

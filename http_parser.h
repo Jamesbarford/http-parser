@@ -1,7 +1,7 @@
 #ifndef HTTP_PARSER_H
 #define HTTP_PARSER_H
 
-#define MAX_HEADERS 10
+#define MAX_HEADERS 40
 
 typedef struct headers_kv_t {
 	char *key;
