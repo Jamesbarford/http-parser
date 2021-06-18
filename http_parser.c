@@ -102,6 +102,7 @@ static int __parse_request(char *req_raw, http_request_t *req) {
 
 static int parseKey(char *raw, char *current, headers_kv_t *headers, int offset,
 		int idx) {
+	// replace : with a null terminator
 	raw[offset] = '\0';
 	headers[idx].key = current;
 	headers[idx].key_len = strlen(current);
@@ -113,6 +114,7 @@ static int parseKey(char *raw, char *current, headers_kv_t *headers, int offset,
 static int parseValue(char *raw, char **current, headers_kv_t *headers,
 		int prev, int offset, int idx) {
 
+	// replace \n with a null terminator
 	raw[offset] = '\0';
 	*current = &raw[prev];
 
@@ -121,6 +123,7 @@ static int parseValue(char *raw, char **current, headers_kv_t *headers,
 
 	*current = &raw[offset + 1];
 
+	// move past \n, onto the next line
 	return offset + 1;
 }
 
